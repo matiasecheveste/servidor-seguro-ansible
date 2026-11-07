@@ -1,0 +1,39 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+- name: Instalar UFW
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+
+# El acceso SSH se agrega antes de activar el cortafuegos para no perder la conexión.
+- name: Permitir SSH con límite de conexiones por minuto
+  community.general.ufw:
+    rule: limit
+    port: "{{ cortafuegos_puerto_ssh }}"
+    proto: tcp
+    comment: SSH con límite de intentos
+
+- name: Permitir los servicios publicados
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.puerto }}"
+    proto: "{{ item.protocolo }}"
+    comment: "{{ item.comentario }}"
+  loop: "{{ cortafuegos_puertos_permitidos }}"
+  loop_control:
+    label: "{{ item.puerto }}/{{ item.protocolo }}"
+
+- name: Denegar el tráfico entrante por defecto
+  community.general.ufw:
+    direction: incoming
+    default: deny
+
+- name: Permitir el tráfico saliente por defecto
+  community.general.ufw:
+    direction: outgoing
+    default: allow
+
+- name: Activar el cortafuegos con registro
+  community.general.ufw:
+    state: enabled
+    logging: "low"

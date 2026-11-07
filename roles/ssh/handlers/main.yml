@@ -1,0 +1,6 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+- name: Reiniciar ssh
+  ansible.builtin.service:
+    name: ssh
+    state: restarted

@@ -1,0 +1,8 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+ssh_usuarios_permitidos: ["{{ usuarios_admin | default('administrador') }}"]
+ssh_max_intentos: 3
+ssh_tiempo_gracia: 30
+# Se corta la sesión tras intervalo × máximo segundos sin respuesta del cliente.
+ssh_intervalo_actividad: 300
+ssh_max_sin_respuesta: 2

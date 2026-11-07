@@ -1,0 +1,7 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+cortafuegos_puertos_permitidos:
+  - { puerto: "80", protocolo: tcp, comentario: "HTTP" }
+  - { puerto: "443", protocolo: tcp, comentario: "HTTPS" }
+  - { puerto: "443", protocolo: udp, comentario: "HTTP/3" }
+cortafuegos_puerto_ssh: "22"

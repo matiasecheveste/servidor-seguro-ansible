@@ -1,0 +1,5 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+nginx_nombre_servidor: "{{ inventory_hostname }}"
+nginx_raiz: /var/www/sitio
+nginx_pedidos_por_segundo: 10

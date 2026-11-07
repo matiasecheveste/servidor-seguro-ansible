@@ -1,0 +1,8 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+# 203.0.113.0/24 es un rango reservado para documentación (RFC 5737).
+servidores:
+  hosts:
+    web01:
+      ansible_host: 203.0.113.10
+      nginx_nombre_servidor: www.ejemplo.uy

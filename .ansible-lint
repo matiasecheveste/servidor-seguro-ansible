@@ -1,0 +1,6 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+profile: production
+exclude_paths:
+  - .cache/
+  - .github/

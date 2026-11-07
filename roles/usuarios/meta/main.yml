@@ -1,0 +1,14 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+galaxy_info:
+  role_name: usuarios
+  namespace: echeveste
+  author: Matías Nicolás Echeveste Cardozo
+  description: Usuario administrador con clave SSH y sudo validado
+  license: MIT
+  min_ansible_version: "2.17"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble
+dependencies: []

@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PubkeyAuthentication yes
+AuthenticationMethods publickey
+PermitEmptyPasswords no
+AllowUsers {{ ssh_usuarios_permitidos | join(' ') }}
+MaxAuthTries {{ ssh_max_intentos }}
+LoginGraceTime {{ ssh_tiempo_gracia }}
+ClientAliveInterval {{ ssh_intervalo_actividad }}
+ClientAliveCountMax {{ ssh_max_sin_respuesta }}
+X11Forwarding no
+AllowAgentForwarding no
+AllowTcpForwarding no
+PermitTunnel no
+LogLevel VERBOSE
+# Algoritmos modernos únicamente
+KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com

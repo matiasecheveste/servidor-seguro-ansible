@@ -1,0 +1,7 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+usuarios_admin: administrador
+usuarios_admin_claves: []
+# Hash SHA-512 de la contraseña para sudo (mkpasswd -m sha-512). Si queda vacío, la cuenta
+# no tiene contraseña: sólo se entra con clave SSH y sudo no la pide.
+usuarios_admin_clave_hash: ""

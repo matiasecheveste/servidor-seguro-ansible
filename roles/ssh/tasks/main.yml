@@ -1,0 +1,32 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+- name: Instalar OpenSSH
+  ansible.builtin.apt:
+    name: openssh-server
+    state: present
+
+- name: Crear el directorio de separación de privilegios
+  ansible.builtin.file:
+    path: /run/sshd
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+# El archivo queda primero en sshd_config.d: OpenSSH usa el primer valor que encuentra,
+# así que estas opciones prevalecen sobre las de otros archivos (por ejemplo cloud-init).
+- name: Configurar el endurecimiento de OpenSSH
+  ansible.builtin.template:
+    src: endurecido.conf.j2
+    dest: /etc/ssh/sshd_config.d/00-endurecido.conf
+    owner: root
+    group: root
+    mode: "0600"
+    validate: /usr/sbin/sshd -t -f %s
+  notify: Reiniciar ssh
+
+- name: Asegurar que OpenSSH esté activo
+  ansible.builtin.service:
+    name: ssh
+    state: started
+    enabled: true

@@ -1,0 +1,4 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+- name: Aplicar el playbook principal
+  ansible.builtin.import_playbook: ../../site.yml

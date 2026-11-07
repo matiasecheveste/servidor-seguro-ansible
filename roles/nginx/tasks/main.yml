@@ -1,0 +1,59 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+- name: Instalar nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
+- name: Quitar el sitio por defecto
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Recargar nginx
+
+- name: Configurar opciones globales de seguridad
+  ansible.builtin.template:
+    src: seguridad.conf.j2
+    dest: /etc/nginx/conf.d/seguridad.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Recargar nginx
+
+- name: Crear la carpeta del sitio
+  ansible.builtin.file:
+    path: "{{ nginx_raiz }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Publicar la página de inicio
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ nginx_raiz }}/index.html"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Configurar el sitio
+  ansible.builtin.template:
+    src: sitio.conf.j2
+    dest: /etc/nginx/sites-available/sitio.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Recargar nginx
+
+- name: Habilitar el sitio
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/sitio.conf
+    dest: /etc/nginx/sites-enabled/sitio.conf
+    state: link
+  notify: Recargar nginx
+
+- name: Asegurar que nginx esté activo
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true

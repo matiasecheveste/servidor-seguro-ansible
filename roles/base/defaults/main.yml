@@ -1,0 +1,27 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+base_zona_horaria: America/Montevideo
+base_paquetes:
+  - ca-certificates
+  - curl
+  - chrony
+  - unattended-upgrades
+  - apt-listchanges
+  - logrotate
+base_reinicio_automatico: false
+base_hora_reinicio: "04:00"
+# En contenedores de prueba no se aplican los parámetros del núcleo (afectarían al anfitrión).
+base_sysctl_aplicar: true
+base_sysctl:
+  net.ipv4.conf.all.rp_filter: 1
+  net.ipv4.conf.default.rp_filter: 1
+  net.ipv4.conf.all.accept_redirects: 0
+  net.ipv4.conf.all.send_redirects: 0
+  net.ipv4.conf.all.accept_source_route: 0
+  net.ipv6.conf.all.accept_redirects: 0
+  net.ipv4.tcp_syncookies: 1
+  net.ipv4.icmp_echo_ignore_broadcasts: 1
+  kernel.kptr_restrict: 2
+  kernel.dmesg_restrict: 1
+  fs.protected_hardlinks: 1
+  fs.protected_symlinks: 1

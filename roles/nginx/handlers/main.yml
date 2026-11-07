@@ -1,0 +1,12 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+# Se valida la configuración completa antes de recargar: un error no deja el servicio caído.
+- name: Recargar nginx
+  ansible.builtin.command: nginx -t
+  changed_when: true
+  notify: Aplicar recarga de nginx
+
+- name: Aplicar recarga de nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded

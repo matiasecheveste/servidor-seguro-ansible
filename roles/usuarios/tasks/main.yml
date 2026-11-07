@@ -1,0 +1,38 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+- name: Verificar que hay al menos una clave pública para el administrador
+  ansible.builtin.assert:
+    that: usuarios_admin_claves | length > 0
+    fail_msg: >-
+      Definí usuarios_admin_claves: sin una clave pública, al desactivar el acceso por
+      contraseña nadie podría volver a entrar al servidor.
+
+- name: Crear el usuario administrador
+  ansible.builtin.user:
+    name: "{{ usuarios_admin }}"
+    shell: /bin/bash
+    create_home: true
+    password: "{{ usuarios_admin_clave_hash | default(omit, true) }}"
+    password_lock: "{{ usuarios_admin_clave_hash == '' }}"
+    update_password: always
+  no_log: "{{ usuarios_admin_clave_hash != '' }}"
+
+- name: Autorizar las claves públicas del administrador
+  ansible.posix.authorized_key:
+    user: "{{ usuarios_admin }}"
+    key: "{{ usuarios_admin_claves | join('\n') }}"
+    exclusive: true
+
+- name: Dar permisos de sudo al administrador
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/90-{{ usuarios_admin }}"
+    content: "{{ usuarios_admin }} ALL=(ALL:ALL) {{ '' if usuarios_admin_clave_hash else 'NOPASSWD: ' }}ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: /usr/sbin/visudo -cf %s
+
+- name: Bloquear la contraseña de root
+  ansible.builtin.user:
+    name: root
+    password_lock: true

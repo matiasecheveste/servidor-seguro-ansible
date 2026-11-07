@@ -1,0 +1,21 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+# Endurece servidores Ubuntu 24.04: usuario administrador, SSH sólo con clave,
+# cortafuegos, fail2ban, actualizaciones automáticas y nginx con cabeceras de seguridad.
+- name: Configurar servidores seguros
+  hosts: servidores
+  become: true
+  roles:
+    - role: base
+      tags: [base]
+    - role: usuarios
+      tags: [usuarios]
+    - role: ssh
+      tags: [ssh]
+    - role: cortafuegos
+      tags: [cortafuegos]
+    - role: nginx
+      tags: [nginx]
+    # Después de nginx: la cárcel nginx-limit-req necesita su archivo de registro.
+    - role: fail2ban
+      tags: [fail2ban]

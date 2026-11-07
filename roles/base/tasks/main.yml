@@ -1,0 +1,49 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+- name: Instalar paquetes base
+  ansible.builtin.apt:
+    name: "{{ base_paquetes }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Configurar la zona horaria
+  community.general.timezone:
+    name: "{{ base_zona_horaria }}"
+
+- name: Habilitar la sincronización horaria
+  ansible.builtin.service:
+    name: chrony
+    state: started
+    enabled: true
+
+- name: Configurar las actualizaciones de seguridad automáticas
+  ansible.builtin.template:
+    src: actualizaciones.j2
+    dest: /etc/apt/apt.conf.d/52-actualizaciones-automaticas
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Activar la ejecución periódica de apt
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+      APT::Periodic::AutocleanInterval "7";
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Aplicar parámetros de endurecimiento del núcleo
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/90-endurecido.conf
+    sysctl_set: "{{ base_sysctl_aplicar }}"
+    reload: "{{ base_sysctl_aplicar }}"
+    state: present
+  loop: "{{ base_sysctl | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"

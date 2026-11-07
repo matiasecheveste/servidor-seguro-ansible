@@ -1,0 +1,91 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+- name: Verificar el endurecimiento
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Leer la configuración efectiva de OpenSSH
+      ansible.builtin.command: sshd -T
+      register: sshd
+      changed_when: false
+
+    - name: Comprobar las opciones de OpenSSH
+      ansible.builtin.assert:
+        that:
+          - "'permitrootlogin no' in sshd.stdout_lines"
+          - "'passwordauthentication no' in sshd.stdout_lines"
+          - "'kbdinteractiveauthentication no' in sshd.stdout_lines"
+          - "'x11forwarding no' in sshd.stdout_lines"
+          - "'maxauthtries 3' in sshd.stdout_lines"
+          - "'allowusers administrador' in sshd.stdout_lines"
+        fail_msg: La configuración efectiva de sshd no es la esperada.
+
+    - name: Leer el estado del cortafuegos
+      ansible.builtin.command: ufw status verbose
+      register: ufw
+      changed_when: false
+
+    - name: Comprobar las reglas del cortafuegos
+      ansible.builtin.assert:
+        that:
+          - "'Status: active' in ufw.stdout"
+          - "'Default: deny (incoming), allow (outgoing)' in ufw.stdout"
+          - ufw.stdout is search('22/tcp\s+LIMIT IN')
+          - ufw.stdout is search('443/udp\s+ALLOW IN')
+
+    - name: Consultar la cárcel de SSH en fail2ban
+      ansible.builtin.command: fail2ban-client status sshd
+      register: carcel
+      changed_when: false
+
+    - name: Comprobar que la cárcel de SSH está activa
+      ansible.builtin.assert:
+        that: "'Currently banned' in carcel.stdout"
+
+    - name: Pedir la página de inicio
+      ansible.builtin.uri:
+        url: http://localhost/
+        return_content: true
+      register: inicio
+
+    - name: Comprobar las cabeceras de seguridad de nginx
+      ansible.builtin.assert:
+        that:
+          - inicio.x_frame_options == 'DENY'
+          - inicio.x_content_type_options == 'nosniff'
+          - "'content_security_policy' in inicio"
+          - inicio.server == 'nginx'
+          - "'Servidor configurado con Ansible' in inicio.content"
+
+    - name: Pedir un archivo oculto
+      ansible.builtin.uri:
+        url: http://localhost/.env
+        status_code: 403
+
+    - name: Consultar los permisos de sudo del administrador
+      ansible.builtin.command: sudo -l -U administrador
+      register: permisos
+      changed_when: false
+
+    - name: Comprobar que el administrador tiene sudo sin contraseña
+      ansible.builtin.assert:
+        that: "'(ALL : ALL) NOPASSWD: ALL' in permisos.stdout"
+
+    - name: Leer la clave autorizada
+      ansible.builtin.slurp:
+        src: /home/administrador/.ssh/authorized_keys
+      register: claves
+
+    - name: Comprobar la clave autorizada
+      ansible.builtin.assert:
+        that: "'molecule-prueba' in (claves.content | b64decode)"
+
+    - name: Consultar la zona horaria
+      ansible.builtin.command: timedatectl show --property=Timezone --value
+      register: zona
+      changed_when: false
+
+    - name: Comprobar la zona horaria
+      ansible.builtin.assert:
+        that: zona.stdout == 'America/Montevideo'

@@ -1,0 +1,6 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+fail2ban_tiempo_bloqueo: 1h
+fail2ban_ventana: 10m
+fail2ban_max_intentos: 5
+fail2ban_ignorar_ips: ["127.0.0.1/8", "::1"]

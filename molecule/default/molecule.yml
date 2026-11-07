@@ -1,0 +1,39 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+# Ubuntu 24.04 con systemd en un contenedor privilegiado: permite probar servicios,
+# UFW y fail2ban de verdad. Molecule aplica el playbook dos veces y falla si la segunda
+# vez algo cambia (idempotencia).
+driver:
+  name: docker
+platforms:
+  - name: ubuntu-2404
+    image: geerlingguy/docker-ubuntu2404-ansible:latest
+    pre_build_image: true
+    privileged: true
+    cgroupns_mode: host
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: ../../roles
+  inventory:
+    group_vars:
+      all:
+        usuarios_admin: administrador
+        usuarios_admin_claves:
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIwzIKSrzFYa8nvGqcd18DwEa1E044Nw2MfItdFmwX+h molecule-prueba
+        base_sysctl_aplicar: false
+        nginx_nombre_servidor: prueba.local
+verifier:
+  name: ansible
+scenario:
+  test_sequence:
+    - dependency
+    - destroy
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy

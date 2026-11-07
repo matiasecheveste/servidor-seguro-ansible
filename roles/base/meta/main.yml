@@ -1,0 +1,14 @@
+---
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+galaxy_info:
+  role_name: base
+  namespace: echeveste
+  author: Matías Nicolás Echeveste Cardozo
+  description: Paquetes base, zona horaria, actualizaciones automáticas y parámetros del núcleo
+  license: MIT
+  min_ansible_version: "2.17"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble
+dependencies: []

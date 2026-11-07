@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+# Servidor seguro con Ansible — Matías Nicolás Echeveste Cardozo
+server_tokens off;
+client_max_body_size 1m;
+limit_req_zone $binary_remote_addr zone=por_ip:10m rate={{ nginx_pedidos_por_segundo }}r/s;
