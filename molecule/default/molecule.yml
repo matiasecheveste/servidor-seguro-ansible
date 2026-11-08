@@ -9,6 +9,8 @@ platforms:
   - name: ubuntu-2404
     image: geerlingguy/docker-ubuntu2404-ansible:latest
     pre_build_image: true
+    groups:
+      - servidores
     privileged: true
     cgroupns_mode: host
     command: ""
