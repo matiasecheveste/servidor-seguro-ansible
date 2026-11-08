@@ -6,7 +6,7 @@
   gather_facts: false
   tasks:
     - name: Leer la configuración efectiva de OpenSSH
-      ansible.builtin.command: sshd -T
+      ansible.builtin.command: /usr/sbin/sshd -T
       register: sshd
       changed_when: false
 
