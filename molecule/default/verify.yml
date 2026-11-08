@@ -22,7 +22,7 @@
         fail_msg: La configuración efectiva de sshd no es la esperada.
 
     - name: Leer el estado del cortafuegos
-      ansible.builtin.command: ufw status verbose
+      ansible.builtin.command: /usr/sbin/ufw status verbose
       register: ufw
       changed_when: false
 
